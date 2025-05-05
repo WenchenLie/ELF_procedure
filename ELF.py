@@ -76,15 +76,15 @@ def calc_ELF(
     elif load_pattern == 'inverted_triangle':
         Cvx = hx / np.sum(hx)
     Fx = Cvx * Vbase  # (12.8-12)
+    Vx = [np.sum(Fx[i:]) for i in range(len(hx))]
     Mbase = np.sum(Fx * hx)  # Base overturning moment
-    df = pd.DataFrame({'Story': range(1, len(hx) + 1), 'wx': wx, 'hx': hx, 'wx*hx^k': wx * hx ** k, 'Cvx': Cvx, 'Fx': Fx})
+    df = pd.DataFrame({'Story': range(1, len(hx) + 1), 'wx': wx, 'hx': hx, 'wx*hx^k': wx * hx ** k, 'Cvx': Cvx, 'Fx': Fx, 'Vx': Vx})
     print(df)
-    df.to_csv(output_file_name + '.csv', index=False)
+    df.to_csv(f'output/{output_file_name}.csv', index=False)
     return Vbase, Mbase, df
 
 
 if __name__ == "__main__":
-    Ct, x = 0.0731, 0.75
     # 4-story
     # wx = np.array([281.596, 280.476, 280.474, 232.731]) * 10  # seismci weight in kN
     # hx = [4.3, 8.3, 12.3, 16.3]
@@ -101,7 +101,8 @@ if __name__ == "__main__":
     TL = 8
     R = 8
     Ie = 1
-    output_file_name = 'MRF8S'
+    Ct, x = 0.0731, 0.75
+    output_file_name = 'SCB-RC-12S'
     Vbase, Mbase, df = calc_ELF(Ct, x, wx, hx, S1, SDS, SD1, TL, R, Ie, output_file_name, load_pattern='as_calculated')
     print('---- Force demand ----')
     print(f"Vbase = {Vbase:.2f} kN")
